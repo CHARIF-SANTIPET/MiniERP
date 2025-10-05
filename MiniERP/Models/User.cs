@@ -3,9 +3,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MiniERP.Models
 {
-    public class User
+    public enum UserRole
     {
-        public int id { get; set; }
+        Admin,
+        Warehouse,
+        salesman,
+        Employees,
+    }
+    public class User : BaseEntity 
+    {
         public required string username { get; set; }
         [JsonIgnore]
         public  required string passwordHash { get; set; }
@@ -13,9 +19,7 @@ namespace MiniERP.Models
         public  required string passwordSalt { get; set; }
         public required string email { get; set; }
         public bool isActive { get; set; }
+        public UserRole Role { get; set; } = UserRole.Employees;
         public DateTime lastLogin { get; set; }
-        public DateTime createAt { get; set; }
-        public DateTime updateAt { get; set; }
-        public DateTime? deleteAt { get; set; }
     }
 }
