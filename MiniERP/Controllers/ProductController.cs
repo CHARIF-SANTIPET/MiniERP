@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiniERP.Data;
@@ -10,6 +11,7 @@ namespace MiniERP.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductController : ControllerBase
     {
         private readonly AppDbContext _db;
@@ -64,6 +66,7 @@ namespace MiniERP.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Warehouse")]
         public ActionResult<ResponseProductDto> CreateProduct([FromBody] CreateProductRequest request)
         {
             if (request == null)
@@ -128,6 +131,7 @@ namespace MiniERP.Controllers
 
         // Admin อัพเดทสินค้า
         [HttpPut("{Id}")]
+        [Authorize(Roles = "Admin,Warehouse")]
         public IActionResult UpdateProduct(int Id, [FromBody] UpdateProductDto updatedProduct)
         {
             var product = _db.Products.FirstOrDefault(p => p.Id == Id);
@@ -186,6 +190,7 @@ namespace MiniERP.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Warehouse")]
         public IActionResult DeleteProduct(int id)
         {
             var product = _db.Products.FirstOrDefault(p => p.Id == id);

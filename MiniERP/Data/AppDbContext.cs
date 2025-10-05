@@ -13,8 +13,8 @@ namespace MiniERP.Data
         public DbSet<Supplier> Suppliers { get; set; } = null!;
         public DbSet<Movement> Movements { get; set; } = null!;
 
-        public DbSet<User> User { get; set; } = null!;
-        public DbSet<UserProfile> UserProfile { get; set; } = null!;
+        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<UserProfile> UserProfiles { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -48,6 +48,13 @@ namespace MiniERP.Data
             modelBuilder.Entity<Product>()
                 .Property(p => p.Sale_price)
                 .HasPrecision(18, 2);
+            modelBuilder.Entity<UserProfile>()
+                .Property(u => u.Salary)
+                .HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<Movement>()
+            .HasOne(m => m.Product)
+            .WithMany(p => p.StockMovement)
+            .HasForeignKey(m => m.ProductId);
         }
     }
 }

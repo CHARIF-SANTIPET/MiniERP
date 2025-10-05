@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiniERP.Data;
@@ -9,6 +10,7 @@ namespace MiniERP.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class MovementController : ControllerBase
     {
 

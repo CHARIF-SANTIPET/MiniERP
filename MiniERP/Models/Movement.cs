@@ -19,6 +19,8 @@
         public Product Product { get; set; } = null!;
         public int SupplierId { get; set; }
         public Supplier Supplier { get; set; } = null!;
+        public int? EmployeeId { get; set; }
+        public User Employee { get; set; } = null!;
 
         //public int saleOrderId { get; set; }
         //public SaleOrder SaleOrder { get; set; } = null!;

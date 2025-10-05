@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MiniERP.Data;
 using MiniERP.Models;
@@ -8,6 +9,7 @@ namespace MiniERP.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+	[Authorize]
     public class SupplierController : ControllerBase
     {
 
@@ -55,6 +57,7 @@ namespace MiniERP.Controllers
 		}
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Warehouse")]
         public ActionResult<ResponseSupplierDto> CreateSupplier([FromBody] UpdateSupplierDto request)
         {
 
@@ -87,6 +90,7 @@ namespace MiniERP.Controllers
 		}
 
         [HttpPut("{Id}")]
+        [Authorize(Roles = "Admin,Warehouse")]
         public IActionResult UpdateSupplier(int Id, [FromBody] UpdateSupplierDto updatedSupplier)
         {
             var existingSupplier = _db.Suppliers.FirstOrDefault(s => s.Id == Id);
@@ -107,7 +111,8 @@ namespace MiniERP.Controllers
 		}
 
 		[HttpDelete("{id}")]
-		public IActionResult DeleteSupplier(int id)
+        [Authorize(Roles = "Admin,Warehouse")]
+        public IActionResult DeleteSupplier(int id)
 		{
 			var existingSupplier = _db.Suppliers.FirstOrDefault(s => s.Id == id);
 			if (existingSupplier == null)

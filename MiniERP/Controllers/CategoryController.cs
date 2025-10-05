@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiniERP.Data;
 using MiniERP.Models;
@@ -8,6 +9,7 @@ namespace MiniERP.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CategoryController : ControllerBase
     {
 
@@ -53,6 +55,7 @@ namespace MiniERP.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Warehouse")]
         public ActionResult<ResponseCategory> CreateCategory([FromBody] string newCategoryName)
         {
             if (newCategoryName == null)
@@ -81,6 +84,7 @@ namespace MiniERP.Controllers
         }
 
         [HttpPut("{Id}")]
+        [Authorize(Roles = "Admin,Warehouse")]
         public IActionResult UpdateCateory(int Id, [FromBody] string newCategoryName)
         {
 
@@ -99,6 +103,7 @@ namespace MiniERP.Controllers
         }
 
         [HttpDelete("{Id}")]
+        [Authorize(Roles = "Admin,Warehouse")]
         public IActionResult DeleteCategory(int Id)
         {
             var existingCategory = _db.Categories.FirstOrDefault(c => c.Id == Id);
