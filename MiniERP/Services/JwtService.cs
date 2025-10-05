@@ -25,7 +25,7 @@ namespace MiniERP.Services
 
             var claims = new List<Claim>();
 
-            claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.username));
+            claims.Add(new Claim(ClaimTypes.Name, user.username));
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
             claims.Add(new Claim("roles", user.Role.ToString()));
 
