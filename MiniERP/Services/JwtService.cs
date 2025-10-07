@@ -36,7 +36,7 @@ namespace MiniERP.Services
                 issuer: issuer,
                 audience: audience,
                 claims: claims,
-                expires: TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time")).AddMinutes(5),
+                expires: TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time")).AddHours(2),
                 signingCredentials: creds
             );
 

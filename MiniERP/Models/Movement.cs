@@ -7,7 +7,8 @@
         Sale,
         Return,
         Transfer,
-        Restock
+        Restock,
+        Delete
     }
     public class Movement 
     {
