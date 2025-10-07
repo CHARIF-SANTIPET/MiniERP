@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MiniERP.Data;
 using MiniERP.Models;
-using Microsoft.EntityFrameworkCore;
+using MiniERP.Models.DTO;
 
 namespace MiniERP.Controllers
 {
@@ -55,7 +56,7 @@ namespace MiniERP.Controllers
         // ✅ Update UserProfile
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public IActionResult UpdateProfile(int id, UserProfile updatedProfile)
+        public IActionResult UpdateProfile(int id, UpdateUserProfileDto updatedProfile)
         {
             var profile = _db.UserProfiles.FirstOrDefault(up => up.Id == id);
             if (profile == null) return NotFound();
