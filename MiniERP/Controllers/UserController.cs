@@ -79,16 +79,36 @@ namespace MiniERP.Controllers
             if (user == null || !PasswordHelper.VerifyPasswordHash(request.password, user.passwordHash, user.passwordSalt))
                 return Unauthorized(new { message = "Invalid username or password" });
 
-            user.lastLogin = DateTime.UtcNow;
+            user.lastLogin = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+            user.isActive = true;
             _db.SaveChanges();
 
             var token = _jwt.GenerateToken(user);
 
-            return Ok(new { token });
+            //var cookieOptions = new CookieOptions
+            //{
+            //    HttpOnly = true, 
+            //    Secure = false,   
+            //    SameSite = SameSiteMode.None,
+            //    //Expires = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time")).AddHours(8)
+            //    Expires = DateTime.UtcNow.AddHours(2)
+            //};
+
+            //Response.Cookies.Append("jwt_token", token, cookieOptions);
+
+
+
+            //return Ok(new { message = "Login successful" });
+            return Ok(new
+            {
+                message = "Login successful",
+                token = token
+            });
         }
 
         // ✅ Get Profile
         [HttpGet("me")]
+        [Authorize]
         public IActionResult GetProfile()
         {
             var username = User.Identity?.Name;
@@ -169,12 +189,54 @@ namespace MiniERP.Controllers
                 return BadRequest(new { message = "Invalid role" });
 
             user.Role = newRole;
-            user.UpdatedAt = DateTime.UtcNow;
+            user.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
 
             _db.SaveChanges();
 
             return Ok(new { message = $"User role updated to {newRole}" });
         }
+
+        [HttpPost("logout")]
+        [Authorize]
+        public IActionResult Logout()
+        {
+            var username = User.Identity?.Name;
+            if (username == null) return Unauthorized();
+
+            var user = _db.Users.FirstOrDefault(u => u.username == username);
+            if (user == null) return NotFound(new { message = "User not found" });
+
+            user.lastLogin = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"));
+            user.isActive = false;
+
+            _db.SaveChanges();
+            // ลบ cookie แบบ HttpOnly
+            //Response.Cookies.Append("jwt_token", "", new CookieOptions
+            //{
+            //    HttpOnly = true,
+            //    Secure = false,        // ถ้า dev ใช้ http    
+            //    SameSite = SameSiteMode.None,
+            //    //Expires = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time")).AddDays(-10) // กำหนดวันหมดอายุเป็นอดีต → browser ลบ
+            //    Expires = DateTime.UtcNow.AddDays(-1)
+
+            //});
+
+            //Response.Cookies.Delete("jwt_token");
+
+            return Ok(new { message = "Logged out" });
+        }
+
+        [HttpGet("protected")]
+        [Authorize] // ต้องมี JWT cookie
+        public IActionResult CheckLogin()
+        {
+            // User.Identity.Name จะมีค่าถ้า token valid
+            var username = User.Identity?.Name;
+            if (username == null) return Unauthorized();
+
+            return Ok(new { message = "User is logged in" });
+        }
+
     }
 
 }
