@@ -102,7 +102,16 @@ namespace MiniERP.Controllers
             return Ok(new
             {
                 message = "Login successful",
-                token = token
+                token = token,
+                user = new
+                {
+                    user.Id,
+                    user.username,
+                    user.email,
+                    user.isActive,
+                    user.Role,
+                    user.lastLogin,
+                }
             });
         }
 

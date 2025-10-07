@@ -1,11 +1,13 @@
 `tsx`
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../contexts/UserContext";
 
 export default function LoginPage() {
 const [userNameInput, setUserNameInput] = useState("");
 const [passKeyInput, setPassKeyInput] = useState("");
 const [error, setError] = useState("");
+const {setUser } = useUser();
   const navigate = useNavigate();
 
   // useEffect(() => {
@@ -48,9 +50,10 @@ const [error, setError] = useState("");
       if (!res.ok) {
         throw new Error(data.message || "Login failed");
       }
-
       // const data = await res.json();
       localStorage.setItem("token", data.token);
+      setUser(data.user);
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       // redirect to dashboard
       navigate("/profile");

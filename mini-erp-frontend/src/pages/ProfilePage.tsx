@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+
 interface UserProfile {
   firstName: string;
   lastName: string;
@@ -30,28 +31,29 @@ interface User {
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState("");
+  
   const navigate = useNavigate();
+  
+  // const handleLogout = async () => {
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     await fetch("https://localhost:7186/api/User/logout", {
+  //       method: "POST",
+  //       // credentials: "include",
+  //       headers: {
+  //         "Authorization": `Bearer ${token}`,
+  //       },
+  //     });
 
-  const handleLogout = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await fetch("https://localhost:7186/api/User/logout", {
-        method: "POST",
-        // credentials: "include",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-      });
+  //     // // ลบ localStorage เผื่อมี token อยู่
+  //     localStorage.removeItem("token");
 
-      // // ลบ localStorage เผื่อมี token อยู่
-      localStorage.removeItem("token");
-
-      // ไปหน้า login
-      navigate("/login");
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  //     // ไปหน้า login
+  //     navigate("/login");
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
 
 
   useEffect(() => {
@@ -86,8 +88,7 @@ export default function ProfilePage() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-white-100 p-4">
       <div className="bg-white p-8 rounded-xl shadow-md w-96">
         <h1 className="text-2xl font-bold mb-4 text-gray-700">Profile</h1>
-        <div className="space-y-2">
-          <p><strong>ID:</strong> {user.id}</p>
+        <div className="space-y-2 ">
           <p><strong>Username:</strong> {user.username}</p>
           <p><strong>Email:</strong> {user.email}</p>
           <p><strong>Status:</strong> {user.isActive ? "Active" : "Inactive"}</p>
@@ -107,12 +108,12 @@ export default function ProfilePage() {
           <p><strong>Hire Date:</strong> {new Date(user.profile.hireDate).toLocaleDateString()}</p>
           <p><strong>End Date:</strong> {user.profile.endDate !== "0001-01-01T00:00:00" ? new Date(user.profile.endDate).toLocaleDateString() : "N/A"}</p>
         </div>
-         <button
+         {/* <button
           onClick={handleLogout}
           className="mt-6 w-full bg-red-500 hover:bg-red-600 text-black font-semibold py-2 rounded"
         >
           Logout
-        </button>
+        </button> */}
       </div>
     </div>
   );

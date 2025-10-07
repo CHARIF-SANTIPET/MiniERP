@@ -3,40 +3,32 @@ import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
+import { UserProvider } from "./contexts/UserContext";
+
 // import DashboardPage from "./pages/DashboardPage"; // สมมติมีหน้า Dashboard
 import './App.css'
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
+    // <UserProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                 <MainLayout>
+                  <ProfilePage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <ProfilePage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <MainLayout>
-                <ProfilePage />
-              </MainLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route path="*" element={<LoginPage />} />
-      </Routes>
-    </Router>
+          <Route path="*" element={<LoginPage />} />
+        </Routes>
+      </Router>
+    // </UserProvider>
   );
 }
 
