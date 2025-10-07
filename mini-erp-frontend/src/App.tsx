@@ -3,7 +3,7 @@ import MainLayout from "./layouts/MainLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
-import { UserProvider } from "./contexts/UserContext";
+import StockListPage from "./pages/StockListPage";
 
 // import DashboardPage from "./pages/DashboardPage"; // สมมติมีหน้า Dashboard
 import './App.css'
@@ -20,6 +20,16 @@ function App() {
               <ProtectedRoute>
                  <MainLayout>
                   <ProfilePage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/stocklist"
+            element={
+              <ProtectedRoute>
+                 <MainLayout>
+                  <StockListPage />
                 </MainLayout>
               </ProtectedRoute>
             }

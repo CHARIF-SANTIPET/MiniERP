@@ -13,6 +13,9 @@
         public int Supplier_Id { get; set; }
         public Supplier Supplier { get; set; } = null!;
 
+        public bool IsDeleted { get; set; } = false;
+        public DateTime DeleteAt { get; set; }
+
         public ICollection<Movement> StockMovement { get; set; } = new List<Movement>();
     }
 }

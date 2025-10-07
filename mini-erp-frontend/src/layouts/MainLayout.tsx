@@ -10,6 +10,7 @@ interface MainLayoutProps {
 export default function MainLayout({children} : MainLayoutProps) {
     const navigate = useNavigate();
     const { user, clearUser } = useUser();
+     const isAdmin = user?.role === 0;
     const handleLogout = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -63,6 +64,15 @@ export default function MainLayout({children} : MainLayoutProps) {
           >
             Stock Log
           </Link>
+          {isAdmin && (
+            <Link
+              to="/stocklog"
+              className="block px-4 py-2 rounded hover:bg-blue-200 hover:text-white"
+            >
+              Test Admin
+            </Link>
+          )}
+          
         </nav>
 
         <div className="p-4 mt-auto text-sm text-gray-300 border-gray-700 text-center">

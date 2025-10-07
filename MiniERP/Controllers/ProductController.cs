@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,12 +24,13 @@ namespace MiniERP.Controllers
        
 
         [HttpGet]
-        public ActionResult<IEnumerable<ResponseProductDto>> GetProducts()
+        public  ActionResult<IEnumerable<ResponseProductDto>> GetProducts()
         {
-            var products = _db.Products.Select(p => new ResponseProductDto
+            var products = _db.Products.Where(p => !p.IsDeleted).Select(p => new ResponseProductDto
             {
                 id = p.Id,
                 name = p.Name,
+                sku = p.Sku,
                 quantity = p.Quantity,
                 costPrice = p.Cost_price,
                 salePrice = p.Sale_price,
@@ -50,6 +52,9 @@ namespace MiniERP.Controllers
             if (product == null)
                 return NotFound(new { message = "Category not found." });
 
+            if (product.IsDeleted)
+                return Conflict(new { message = "Product already delete" });
+
             ResponseProductDto response = new ResponseProductDto
             {
                 id = product.Id,
@@ -60,7 +65,9 @@ namespace MiniERP.Controllers
                 categoryId = product.CategoryId,
                 supplierId = product.Supplier_Id,
                 createAt = product.CreatedAt,
-                updateAt = product.UpdatedAt
+                updateAt = product.UpdatedAt,
+                sku = product.Sku
+                   
             };
             return response;
         }
@@ -72,14 +79,15 @@ namespace MiniERP.Controllers
             if (request == null)
                 return BadRequest("Create data is required.");
 
-            //var newProduct = request.product;
-
-            //if(newProduct == null ) 
-            //    return BadRequest("Invalid Product Data);
 
             var existSupplier = _db.Suppliers.Find(request.product.SupplierId);
             if (existSupplier == null)
                 return NotFound(new { message = "Supplier not found." });
+
+            var employeeId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(employeeId))
+                return Unauthorized("Invalid token");
 
             var existingProduct = _db.Products.FirstOrDefault(p => p.Name == request.product.Name || p.Sku == request.Sku);
 
@@ -116,16 +124,27 @@ namespace MiniERP.Controllers
                 ProductId = newProduct.Id,
                 SupplierId = newProduct.Supplier_Id,
                 Date = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time")),
+                EmployeeId = int.Parse(employeeId),
             };
 
             _db.Movements.Add(newMovement);
             _db.SaveChanges();
 
             return CreatedAtAction(
-                   nameof(GetProductById),
-                   new { id = newProduct.Id },
-                   newProduct
-               );
+                nameof(GetProductById),
+                new { id = newProduct.Id },
+                new ResponseProductDto  // ใช้ DTO แทน
+                {
+                    id = newProduct.Id,
+                    name = newProduct.Name,
+                    sku = newProduct.Sku,
+                    quantity = newProduct.Quantity,
+                    costPrice = newProduct.Cost_price,
+                    salePrice = newProduct.Sale_price,
+                    categoryId = newProduct.CategoryId,
+                    supplierId = newProduct.Supplier_Id
+                }
+            );
         }
 
 
@@ -191,16 +210,43 @@ namespace MiniERP.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin,Warehouse")]
-        public IActionResult DeleteProduct(int id)
+        public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = _db.Products.FirstOrDefault(p => p.Id == id);
+            var product = await _db.Products.FindAsync(id);
             if (product == null)
                 return NotFound(new { message = "Product not found." });
 
-            _db.Products.Remove(product);
-            _db.SaveChanges();
+            if (product.IsDeleted)
+                return Conflict(new { message = "Product already delete" });
 
-            return NoContent(); 
+            product.IsDeleted = true;
+            product.DeleteAt = TimeZoneInfo.ConvertTimeFromUtc(
+                                    DateTime.UtcNow,
+                                    TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time")
+                                );
+
+            var employeeIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(employeeIdClaim, out int employeeId))
+            {
+                return Unauthorized(new { message = "Invalid EmployeeId in token." });
+            }
+            Movement newMovement = new Movement
+            {
+                Type = MovementType.Delete,
+                Quatity_change = -product.Quantity,
+                ProductId = product.Id,
+                Date = TimeZoneInfo.ConvertTimeFromUtc(
+                                    DateTime.UtcNow,
+                                    TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time")
+                                ),
+                EmployeeId = employeeId,    
+            };
+
+            _db.Movements.Add(newMovement);
+            _db.SaveChanges();
+            
+
+            return Ok(new { message = "Delete succesful." }); 
         }
 
     }
