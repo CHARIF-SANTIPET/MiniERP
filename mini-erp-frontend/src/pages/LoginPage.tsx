@@ -56,7 +56,7 @@ const {setUser } = useUser();
       localStorage.setItem("user", JSON.stringify(data.user));
 
       // redirect to dashboard
-      navigate("/profile");
+      navigate("/stocklist");
     } catch (err: any) {
       setError(err.message);
     }

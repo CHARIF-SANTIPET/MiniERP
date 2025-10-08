@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-
 interface UserProfile {
   firstName: string;
   lastName: string;
@@ -31,30 +30,7 @@ interface User {
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState("");
-  
   const navigate = useNavigate();
-  
-  // const handleLogout = async () => {
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     await fetch("https://localhost:7186/api/User/logout", {
-  //       method: "POST",
-  //       // credentials: "include",
-  //       headers: {
-  //         "Authorization": `Bearer ${token}`,
-  //       },
-  //     });
-
-  //     // // ลบ localStorage เผื่อมี token อยู่
-  //     localStorage.removeItem("token");
-
-  //     // ไปหน้า login
-  //     navigate("/login");
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
-
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -62,7 +38,6 @@ export default function ProfilePage() {
       try {
         const res = await fetch("https://localhost:7186/api/User/me", {
           method: "GET",
-          // credentials: "include", // ส่ง cookie ไปด้วย
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -81,39 +56,223 @@ export default function ProfilePage() {
     fetchProfile();
   }, []);
 
-  if (error) return <p className="text-red-600">{error}</p>;
-  if (!user) return <p>Loading...</p>;
+  if (error) return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
+        <p className="text-red-600 text-center">{error}</p>
+      </div>
+    </div>
+  );
+
+  if (!user) return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Loading...</p>
+      </div>
+    </div>
+  );
+
+  const roleMap: Record<number, string> = {
+    0: "Admin",
+    1: "Warehouse",
+    2: "Salesman",
+    3: "Employee",
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white-100 p-4">
-      <div className="bg-white p-8 rounded-xl shadow-md w-96">
-        <h1 className="text-2xl font-bold mb-4 text-gray-700">Profile</h1>
-        <div className="space-y-2 ">
-          <p><strong>Username:</strong> {user.username}</p>
-          <p><strong>Email:</strong> {user.email}</p>
-          <p><strong>Status:</strong> {user.isActive ? "Active" : "Inactive"}</p>
-          <p><strong>Role:</strong> {user.role}</p>
-          <p><strong>Last Login:</strong> {new Date(user.lastLogin).toLocaleString()}</p>
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="max-w-5xl mx-auto">
+        {/* Header Card */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl shadow-lg overflow-hidden mb-6">
+          <div className="px-8 py-10">
+            <div className="flex items-center gap-6">
+              {/* Avatar */}
+              <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center text-blue-600 text-4xl font-bold shadow-lg">
+                {user.profile.firstName.charAt(0).toUpperCase()}
+                {user.profile.lastName.charAt(0).toUpperCase()}
+              </div>
+              
+              {/* User Info */}
+              <div className="flex-1">
+                <h1 className="text-3xl font-bold text-white mb-2">
+                  {user.profile.firstName} {user.profile.lastName}
+                </h1>
+                <div className="flex flex-wrap gap-3 text-blue-100">
+                  <span className="flex items-center gap-1">
+                    <span className="text-lg">💼</span> {user.profile.position}
+                  </span>
+                  <span>•</span>
+                  <span className="flex items-center gap-1">
+                    <span className="text-lg">🏢</span> {user.profile.department}
+                  </span>
+                  <span>•</span>
+                  <span className="flex items-center gap-1">
+                    <span className="text-lg"></span> {roleMap[user.role]}
+                  </span>
+                </div>
+              </div>
 
-          <h2 className="text-lg font-semibold mt-4">Profile Details</h2>
-          <p><strong>Name:</strong> {user.profile.firstName} {user.profile.lastName}</p>
-          <p><strong>Phone:</strong> {user.profile.phoneNumber}</p>
-          <p><strong>Address:</strong> {user.profile.address}</p>
-          <p><strong>Position:</strong> {user.profile.position}</p>
-          <p><strong>Department:</strong> {user.profile.department}</p>
-          <p><strong>Salary:</strong> {user.profile.salary}</p>
-          <p><strong>Gender:</strong> {user.profile.gender}</p>
-          <p><strong>Birthday:</strong> {user.profile.birthday}</p>
-          <p><strong>Description:</strong> {user.profile.description}</p>
-          <p><strong>Hire Date:</strong> {new Date(user.profile.hireDate).toLocaleDateString()}</p>
-          <p><strong>End Date:</strong> {user.profile.endDate !== "0001-01-01T00:00:00" ? new Date(user.profile.endDate).toLocaleDateString() : "N/A"}</p>
+              {/* Status Badge */}
+              <div className="text-right">
+                <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${
+                  user.isActive 
+                    ? "bg-green-100 text-green-700" 
+                    : "bg-red-100 text-red-700"
+                }`}>
+                  <span className={`w-2 h-2 rounded-full ${
+                    user.isActive ? "bg-green-500" : "bg-red-500"
+                  }`}></span>
+                  {user.isActive ? "Active" : "Inactive"}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
-         {/* <button
-          onClick={handleLogout}
-          className="mt-6 w-full bg-red-500 hover:bg-red-600 text-black font-semibold py-2 rounded"
-        >
-          Logout
-        </button> */}
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Account Info */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Account Information */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span className="text-2xl">👤</span> Account Information
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Username</p>
+                  <p className="text-gray-800 font-medium">{user.username}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Email</p>
+                  <p className="text-gray-800 font-medium">{user.email}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Last Login</p>
+                  <p className="text-gray-800 font-medium">
+                    {new Date(user.lastLogin).toLocaleString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Information */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span className="text-2xl">📞</span> Contact
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Phone Number</p>
+                  <p className="text-gray-800 font-medium">{user.profile.phoneNumber || "N/A"}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Address</p>
+                  <p className="text-gray-800 font-medium">{user.profile.address || "N/A"}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Personal & Employment Info */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Personal Information */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span className="text-2xl">📋</span> Personal Information
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Gender</p>
+                  <p className="text-gray-800 font-medium">{user.profile.gender || "N/A"}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Birthday</p>
+                  <p className="text-gray-800 font-medium">
+                    {user.profile.birthday 
+                      ? new Date(user.profile.birthday).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })
+                      : "N/A"}
+                  </p>
+                </div>
+                <div className="md:col-span-2">
+                  <p className="text-sm text-gray-500 mb-1">Description</p>
+                  <p className="text-gray-800 font-medium">{user.profile.description || "N/A"}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Employment Information */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span className="text-2xl">💼</span> Employment Information
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Position</p>
+                  <p className="text-gray-800 font-medium">{user.profile.position}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Department</p>
+                  <p className="text-gray-800 font-medium">{user.profile.department}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Salary</p>
+                  <p className="text-gray-800 font-medium text-lg">
+                    ${user.profile.salary.toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Hire Date</p>
+                  <p className="text-gray-800 font-medium">
+                    {new Date(user.profile.hireDate).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </p>
+                </div>
+                {user.profile.endDate && user.profile.endDate !== "0001-01-01T00:00:00" && (
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">End Date</p>
+                    <p className="text-gray-800 font-medium">
+                      {new Date(user.profile.endDate).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4">
+              <button
+                onClick={() => navigate('/edit-profile')}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md transition-colors"
+              >
+                Edit Profile
+              </button>
+              <button
+                onClick={() => navigate('/change-password')}
+                className="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 rounded-lg shadow-md transition-colors"
+              >
+                Change Password
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { useNavigate, useLocation  } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 
 interface MainLayoutProps {
@@ -23,7 +23,7 @@ interface MainLayoutProps {
 export default function MainLayout({children} : MainLayoutProps) {
     const navigate = useNavigate();
     const { user, clearUser } = useUser();
-     const isAdmin = user?.role === 0;
+     const isInventory = user?.role === 0 || user?.role === 1;
     const handleLogout = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -53,12 +53,12 @@ export default function MainLayout({children} : MainLayoutProps) {
           Mini ERP
         </div>    
         <nav className="flex-1 p-2 space-y-2 ">
-          <Link
+          {/* <Link
             to="/dashboard"
             className="block px-4 py-2 rounded hover:bg-blue-200 hover:text-fuchsia-600  "
           >
             Dashboard
-          </Link>
+          </Link> */}
           <Link
             to="/stocklist"
             className="block px-4 py-2 rounded hover:bg-blue-200 hover:text-white  "
@@ -66,22 +66,24 @@ export default function MainLayout({children} : MainLayoutProps) {
             Stock
           </Link>
           
-          <Link
-            to="/stocklog"
-            className="block px-4 py-2 rounded hover:bg-blue-200 hover:text-white"
-          >
-            Stock Log
-          </Link>
+          {isInventory && (
+            <Link
+              to="/stocklog"
+              className="block px-4 py-2 rounded hover:bg-blue-200 hover:text-white"
+            >
+              Stock Log
+            </Link>
+          )}
 
 
-          {isAdmin && (
+          {/* {isAdmin && (
             <Link
               to="/stocklog"
               className="block px-4 py-2 rounded hover:bg-blue-200 hover:text-white"
             >
               Test Admin
             </Link>
-          )}
+          )} */}
           
         </nav>
 
@@ -93,7 +95,7 @@ export default function MainLayout({children} : MainLayoutProps) {
               case 1:
                 return "Inventory";
               case 2:
-                return "Staff";
+                return "Saleman";
               case 3:
                 return "Employee"
               default:
@@ -113,11 +115,11 @@ export default function MainLayout({children} : MainLayoutProps) {
           {/* Username + Logout อยู่ด้านขวา */}
           <div className="flex items-center gap-4">
             <Link
-            to="/profile"
-            className="block px-4 py-2 rounded text-lg font-semibold hover:bg-blue-200"
-          >
-            {user?.username || "Employee"}
-          </Link>
+              to="/profile"
+              className="block outline outline-blue-500 px-4 py-2 rounded text-lg font-semibold hover:bg-blue-200"
+            >
+              {user?.username ||"Employee"}
+            </Link>
             <button
               className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
               onClick={handleLogout}
