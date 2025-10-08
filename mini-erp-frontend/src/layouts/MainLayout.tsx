@@ -1,11 +1,24 @@
 
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation  } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 
 interface MainLayoutProps {
   children: React.ReactNode;
 }
+
+ const getPageTitle = () => {
+    switch (location.pathname) {
+      case "/profile":
+        return "Profile";
+      case "/stocklist":
+        return "Stock";
+      case "/stocklog":
+        return "Stock Log";
+      default:
+        return "Dashboard";
+    }
+  };
 
 export default function MainLayout({children} : MainLayoutProps) {
     const navigate = useNavigate();
@@ -72,28 +85,46 @@ export default function MainLayout({children} : MainLayoutProps) {
           
         </nav>
 
-        <div className="p-4 mt-auto text-sm text-gray-300 border-gray-700 text-center">
-          {user?.role}
-          <Link
-            to="/profile"
-            className="block px-4 py-2 rounded hover:bg-blue-200 hover:text-white  "
-          >
-            Stock List
-          </Link>
+        <div className="xl p-5 mt-auto text-2xl text-white border-gray-700 text-center">
+          {(() => {
+            switch (user?.role) {
+              case 0:
+                return "Admin";
+              case 1:
+                return "Inventory";
+              case 2:
+                return "Staff";
+              case 3:
+                return "Employee"
+              default:
+                return "Anonymouse";
+            }
+          })()}
         </div>
       </aside>
 
       {/* Main content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="h-20  bg-white shadow flex items-center justify-between px-6">
-          <div className="text-lg font-semibold">Welcome, User : {user?.username || "ใครวะ"}</div>
-          <button
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-            onClick={handleLogout}
+        <header className="h-20 bg-white shadow flex items-center justify-between px-6">
+          {/* Title อยู่ด้านซ้าย */}
+          <div className="text-3xl font-bold">{getPageTitle()}</div>
+
+          {/* Username + Logout อยู่ด้านขวา */}
+          <div className="flex items-center gap-4">
+            <Link
+            to="/profile"
+            className="block px-4 py-2 rounded text-lg font-semibold hover:bg-blue-200"
           >
-            Logout
-          </button>
+            {user?.username || "Employee"}
+          </Link>
+            <button
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+              onClick={handleLogout}
+            >
+              Logout
+            </button>
+          </div>
         </header>
 
         {/* Page content */}
