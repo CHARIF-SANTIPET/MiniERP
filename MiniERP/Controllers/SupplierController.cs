@@ -82,11 +82,7 @@ namespace MiniERP.Controllers
 
 			_db.SaveChanges();
 
-			return CreatedAtAction(
-				   nameof(GetSupplierById),
-				   new { id = newSupplier.Id },
-                   newSupplier
-               );
+			return Ok(new { message = "Add supplier succesful" });
 		}
 
         [HttpPut("{Id}")]

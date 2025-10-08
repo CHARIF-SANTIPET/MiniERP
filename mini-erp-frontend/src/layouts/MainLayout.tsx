@@ -50,20 +50,17 @@ export default function MainLayout({children} : MainLayoutProps) {
             to="/stocklist"
             className="block px-4 py-2 rounded hover:bg-blue-200 hover:text-white  "
           >
-            Stock List
+            Stock
           </Link>
-          <Link
-            to="/stockManage"
-            className="block px-4 py-2 rounded hover:bg-blue-200 hover:text-white  "
-          >
-            Stock Manage
-          </Link>
+          
           <Link
             to="/stocklog"
             className="block px-4 py-2 rounded hover:bg-blue-200 hover:text-white"
           >
             Stock Log
           </Link>
+
+
           {isAdmin && (
             <Link
               to="/stocklog"

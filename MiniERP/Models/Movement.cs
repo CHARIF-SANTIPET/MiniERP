@@ -22,6 +22,8 @@
         public Supplier Supplier { get; set; } = null!;
         public int? EmployeeId { get; set; }
         public User Employee { get; set; } = null!;
+        public string Note { get; set; }
+        public string Customer { get; set; }
 
         //public int saleOrderId { get; set; }
         //public SaleOrder SaleOrder { get; set; } = null!;

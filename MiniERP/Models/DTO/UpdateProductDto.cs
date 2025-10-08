@@ -1,6 +1,6 @@
 ﻿namespace MiniERP.Models.DTO
 {
-    public class UpdateProductDto
+    public class    UpdateProductDto
     {
         public string Name { get; set; }
         public decimal CostPrice { get; set; }
