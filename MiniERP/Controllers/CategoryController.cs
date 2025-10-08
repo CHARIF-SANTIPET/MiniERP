@@ -28,9 +28,9 @@ namespace MiniERP.Controllers
                 {
                     Id = c.Id,
                     Name = c.Name,
-                    CreatedAt = c.CreatedAt,
-                    UpdatedAt = c.UpdatedAt
-                })
+                    //CreatedAt = c.CreatedAt,
+                    //UpdatedAt = c.UpdatedAt
+                })  
                 .ToList();
 
 
@@ -47,8 +47,8 @@ namespace MiniERP.Controllers
             {
                 Id = category_db.Id,
                 Name = category_db.Name,
-                CreatedAt = category_db.CreatedAt,
-                UpdatedAt = category_db.UpdatedAt
+                //CreatedAt = category_db.CreatedAt,
+                //UpdatedAt = category_db.UpdatedAt
             };
 
             return Ok(response);

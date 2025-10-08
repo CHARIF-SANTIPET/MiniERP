@@ -10,8 +10,8 @@
         public decimal salePrice { get; set; }
         public int categoryId { get; set; }
         public int supplierId { get; set; }
-        public DateTime createAt { get; set; }
-        public DateTime updateAt { get; set; }
+        //public DateTime createAt { get; set; }
+        //public DateTime updateAt { get; set; }
 
     }
 }

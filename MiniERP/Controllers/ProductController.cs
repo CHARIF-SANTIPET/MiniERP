@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Azure.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -36,8 +37,8 @@ namespace MiniERP.Controllers
                 salePrice = p.Sale_price,
                 categoryId = p.CategoryId,
                 supplierId = p.Supplier_Id,
-                createAt = p.CreatedAt,
-                updateAt = p.UpdatedAt
+                //createAt = p.CreatedAt,
+                //updateAt = p.UpdatedAt
 
             }).ToList();
 
@@ -64,8 +65,8 @@ namespace MiniERP.Controllers
                 salePrice = product.Sale_price,
                 categoryId = product.CategoryId,
                 supplierId = product.Supplier_Id,
-                createAt = product.CreatedAt,
-                updateAt = product.UpdatedAt,
+                //createAt = product.CreatedAt,
+                //updateAt = product.UpdatedAt,
                 sku = product.Sku
                    
             };
@@ -137,7 +138,7 @@ namespace MiniERP.Controllers
                 {
                     id = newProduct.Id,
                     name = newProduct.Name,
-                    sku = newProduct.Sku,
+                    sku = newProduct.Sku,   
                     quantity = newProduct.Quantity,
                     costPrice = newProduct.Cost_price,
                     salePrice = newProduct.Sale_price,
@@ -159,12 +160,14 @@ namespace MiniERP.Controllers
             if (product == null)
                 return NotFound(new { message = "Product not found." });
 
-            if (_db.Products.Any(p => p.Name == updatedProduct.Name))
+            if (_db.Products.Any(p => p.Name == updatedProduct.Name && p.Id != Id))
                 return Conflict(new { message = "Product name already exists." });
 
             product.Name = updatedProduct.Name;
             product.Cost_price = updatedProduct.CostPrice;
             product.Sale_price = updatedProduct.SalePrice;
+            product.CategoryId = updatedProduct.CategoryId;
+            product.Supplier_Id = updatedProduct.SupplierId;
             product.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(
                                     DateTime.UtcNow,
                                     TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time")
@@ -176,27 +179,36 @@ namespace MiniERP.Controllers
         }
 
         [HttpPatch("{id}")]
-        public IActionResult UpdateProductQuantity(int id, int quantity, MovementType movementType)
+        public IActionResult UpdateProductQuantity(UpdateProductQuantityDto request)
         {
-            var product = _db.Products.FirstOrDefault(p => p.Id == id);
+            var product = _db.Products.FirstOrDefault(p => p.Id == request.ProductId);
             if( product == null)
                 return NotFound(new { message = "Product not found." });
-            if( product.Quantity + quantity < 0)
+            if( product.Quantity + request.Quatity_change < 0)
                 return Conflict(new { message = "Product quantity not available." });
 
 
-            product.Quantity += quantity;
+            product.Quantity += request.Quatity_change;
             product.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(
                                     DateTime.UtcNow,
                                     TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time")
                                 );
 
+            var employeeIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(employeeIdClaim, out int employeeId))
+            {
+                return Unauthorized(new { message = "Invalid EmployeeId in token." });
+            }
+
             Movement newMovement = new Movement
             {
-                Type = movementType,
-                Quatity_change = quantity,
+                Type = request.MovementType,
+                Quatity_change = request.Quatity_change,
                 ProductId = product.Id,
+                EmployeeId = employeeId,
                 SupplierId = product.Supplier_Id,
+                Note = request.Note,
+                Customer = request.Customer,
                 Date = TimeZoneInfo.ConvertTimeFromUtc(
                                     DateTime.UtcNow,
                                     TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time")
@@ -234,6 +246,7 @@ namespace MiniERP.Controllers
             {
                 Type = MovementType.Delete,
                 Quatity_change = -product.Quantity,
+                SupplierId = product.Supplier_Id,
                 ProductId = product.Id,
                 Date = TimeZoneInfo.ConvertTimeFromUtc(
                                     DateTime.UtcNow,

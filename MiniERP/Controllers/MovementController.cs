@@ -22,34 +22,48 @@ namespace MiniERP.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<ResponseMovementDto>> GetMovements()
+        public async Task<ActionResult<IEnumerable<ResponseMovementDto>>> GetMovements()
         {
-            var movements = _db.Movements.AsNoTracking().Select( m => new ResponseMovementDto
-            {
-                id = m.Id,
-                movementType = m.Type,
-                quantityChange = m.Quatity_change,
-                date = m.Date,
-                productId = m.ProductId,
-                supplierId = m.SupplierId
-            }).ToList();
+            var movements = await _db.Movements
+                .Include(m => m.Product)
+                .Include(m => m.Supplier)
+                .Include(m => m.Employee)
+                .Select(m => new ResponseMovementDto
+                {
+                    id = m.Id,
+                    movementType = m.Type.ToString(),
+                    quantityChange = m.Quatity_change,
+                    date = m.Date,
+                    ProductName = m.Product.Name,
+                    SupplierName = m.Supplier.Name,
+                    EmployeeName = m.Employee != null ? m.Employee.username : "",
+                    Note = m.Note,
+                    Customer = m.Customer
+                }).ToListAsync();
+
             return Ok(movements);
         }
 
         [HttpGet("Item/{productId}")]
-        public ActionResult<IEnumerable<ResponseMovementDto>> GetMovementByItemId(int productId)
-        {   
-            
-            var movements = _db.Movements.AsNoTracking().Where(m => m.ProductId == productId).Select( m => new ResponseMovementDto
-            {
-                id = m.Id,
-                movementType = m.Type,
-                quantityChange = m.Quatity_change,
-                date = m.Date,
-                productId = m.ProductId,
-                supplierId = m.SupplierId
-            }
-                ).ToList();
+        public async Task<ActionResult<IEnumerable<ResponseMovementDto>>> GetMovementByItemId(int productId)
+        {
+
+            var movements = await _db.Movements
+                 .Include(m => m.Product)
+                 .Include(m => m.Supplier)
+                 .Include(m => m.Employee)
+                 .Select(m => new ResponseMovementDto
+                 {
+                     id = m.Id,
+                     movementType = m.Type.ToString(),
+                     quantityChange = m.Quatity_change,
+                     date = m.Date,
+                     ProductName = m.Product.Name,
+                     SupplierName = m.Supplier.Name,
+                     EmployeeName = m.Employee != null ? m.Employee.username : "",
+                     Note = m.Note,
+                     Customer = m.Customer
+                 }).ToListAsync();
             if (!movements.Any())
                 return NotFound(new { message = "Product not found or No movement history" });
 
