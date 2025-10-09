@@ -5,6 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using MiniERP.Data;
 using MiniERP.Models;
 using MiniERP.Models.DTO;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
+
+
 
 namespace MiniERP.Controllers
 {
@@ -70,45 +75,91 @@ namespace MiniERP.Controllers
             return Ok(movements);
         }
 
-        //[HttpPost]
-        //public ActionResult<string> CreateMovement([FromBody] Movement movement)
+        //[HttpGet("export-pdf")]
+        //public IActionResult ExportMovementsToPDF()
         //{
-        //    if (movement == null)
-        //        return BadRequest("Movement data is required.");
-        //    if(!Enum.IsDefined(typeof(MovementType), movement.Type))
-        //        return Conflict("Invalid Movement Type.");
-        //    movement.Id = Movements.Count > 0 ? Movements.Max(m => m.Id) + 1 : 1;
-        //    Movements.Add(movement);
+        //    var movements = _db.Movements
+        //        .Include(m => m.Product)
+        //        .Include(m => m.Supplier)
+        //        .Include(m => m.Employee)
+        //        .ToList();
 
-        //    return CreatedAtAction(nameof(GetMovements), new { Id = movement.Id }, movement);
+        //    var document = Document.Create(container =>
+        //    {
+        //        container.Page(page =>
+        //        {
+        //            page.Size(PageSizes.A4.Landscape());
+        //            page.Margin(2, Unit.Centimetre);
 
+        //            // Header
+        //            page.Header().Text("Stock Movement Report")
+        //                .FontSize(20).Bold().AlignCenter();
+
+        //            // Content
+        //            page.Content().Column(column =>
+        //            {
+        //                column.Item().Text($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm}")
+        //                    .FontSize(10);
+
+        //                column.Item().PaddingVertical(10);
+
+        //                // Table
+        //                column.Item().Table(table =>
+        //                {
+        //                    table.ColumnsDefinition(columns =>
+        //                    {
+        //                        columns.RelativeColumn();
+        //                        columns.RelativeColumn();
+        //                        columns.RelativeColumn();
+        //                        columns.RelativeColumn();
+        //                        columns.RelativeColumn();
+        //                        columns.RelativeColumn();
+        //                    });
+
+        //                    // Header
+        //                    table.Header(header =>
+        //                    {
+        //                        header.Cell().Background(Colors.Blue.Medium)
+        //                            .Padding(5).Text("Product").FontColor(Colors.White);
+        //                        header.Cell().Background(Colors.Blue.Medium)
+        //                            .Padding(5).Text("Type").FontColor(Colors.White);
+        //                        header.Cell().Background(Colors.Blue.Medium)
+        //                            .Padding(5).Text("Quantity").FontColor(Colors.White);
+        //                        header.Cell().Background(Colors.Blue.Medium)
+        //                            .Padding(5).Text("Date").FontColor(Colors.White);
+        //                        header.Cell().Background(Colors.Blue.Medium)
+        //                            .Padding(5).Text("Employee").FontColor(Colors.White);
+        //                        header.Cell().Background(Colors.Blue.Medium)
+        //                            .Padding(5).Text("Supplier").FontColor(Colors.White);
+        //                    });
+
+        //                    // Body
+        //                    foreach (var m in movements)
+        //                    {
+        //                        table.Cell().Padding(5).Text(m.Product.Name);
+        //                        table.Cell().Padding(5).Text(m.Type.ToString());
+        //                        table.Cell().Padding(5).Text(m.Quatity_change.ToString());
+        //                        table.Cell().Padding(5).Text(m.Date.ToString("yyyy-MM-dd"));
+        //                        table.Cell().Padding(5).Text(m.Employee?.username ?? "N/A");
+        //                        table.Cell().Padding(5).Text(m.Supplier?.Name ?? "N/A");
+        //                    }
+        //                });
+        //            });
+
+        //            // Footer
+        //            page.Footer()
+        //                .AlignCenter()
+        //                .Text(x =>
+        //                {
+        //                    x.Span("Page ");
+        //                    x.CurrentPageNumber();
+        //                });
+        //        });
+        //    });
+
+        //    var pdf = document.GeneratePdf();
+        //    return File(pdf, "application/pdf", $"stock-movement-{DateTime.Now:yyyy-MM-dd}.pdf");
         //}
 
-        //[HttpPut("{Id}")]
-        //public ActionResult UpdateMovement(int Id, [FromBody] Movement updatedMovement)
-        //{
-        //    if (updatedMovement == null)
-        //        return BadRequest("Movement data is required.");
-        //    var movement = Movements.FirstOrDefault(m => m.Id == Id);
-        //    if (movement == null)
-        //        return NotFound();
-        //    movement.Type = updatedMovement.Type;
-        //    movement.Quatity_change = updatedMovement.Quatity_change;
-        //    movement.ProductId = updatedMovement.ProductId;
-        //    movement.SupplierId = updatedMovement.SupplierId;
-
-        //    return CreatedAtAction(nameof(GetMovements), new { Id = movement.Id }, movement);
-
-        //}
-
-        //[HttpDelete("{Id}")]
-        //public ActionResult DeleteMovement(int Id)
-        //{
-        //    var movement = Movements.FirstOrDefault(m => m.Id == Id);
-        //    if (movement == null)
-        //        return NotFound();
-        //    Movements.Remove(movement);
-        //    return Content("delete " + Id + " success");
-        //}
     }
 }

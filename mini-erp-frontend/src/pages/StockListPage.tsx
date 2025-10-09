@@ -197,16 +197,16 @@ export default function StockListPage() {
   return (
     <div className="flex-1 p-6 space-y-6">
       {/* บล็อคสถิติ */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded shadow text-center">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white p-4 rounded-lg shadow-md text-center">
           <p className="text-gray-500">Total Products</p>
-          <p className="text-2xl font-bold">{totalProducts}</p>
+          <p className="text-2xl font-bold ">{totalProducts}</p>
         </div>
-        <div className="bg-white p-4 rounded shadow text-center">
+        <div className="bg-white p-4 rounded-lg shadow-md text-center">
           <p className="text-gray-500">Total Quantity</p>
           <p className="text-2xl font-bold">{totalQuantity}</p>
         </div>
-        <div className="bg-white p-4 rounded shadow text-center">
+        <div className="bg-white p-4 rounded-lg shadow-md text-center">
           <p className="text-gray-500">Total Value</p>
           <p className="text-2xl font-bold">${totalValue.toFixed(2)}</p>
         </div>
